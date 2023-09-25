@@ -38,3 +38,17 @@ INSERT INTO Cart (user_id, product_id, quantity) VALUES
 INSERT INTO Orders (user_id, total_price, status) VALUES
 (1, 2400.00, 'Shipped'),
 (2, 800.00, 'Pending');
+
+-- Create View
+CREATE OR REPLACE VIEW CartView AS
+SELECT
+  Cart.id,
+  Cart.user_id,
+  Cart.quantity,
+  Products.name,
+  Products.price,
+  Products.description,
+  Products.category
+FROM
+  Cart
+JOIN Products ON Cart.product_id = Products.id;

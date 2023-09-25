@@ -80,9 +80,10 @@ app.post("/api/cart", async (req, res) => {
 app.get("/api/cart/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
-    const { rows } = await pool.query("SELECT * FROM Cart WHERE user_id = $1", [
-      user_id,
-    ]);
+    const { rows } = await pool.query(
+      "SELECT * FROM CartView WHERE user_id = $1",
+      [user_id]
+    );
     res.json(rows);
   } catch (err) {
     console.error(err);
