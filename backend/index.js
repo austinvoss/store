@@ -17,36 +17,15 @@ const pool = new Pool({
 // Middleware to parse JSON
 app.use(express.json());
 
-// Fetch all products
+// Fetch all products with optional filters
 app.get("/api/products", async (req, res) => {
-  try {
-    const { rows } = await pool.query("SELECT * FROM Products");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-});
-
-// Fetch all products with sorting and filtering
-app.get("/api/products", async (req, res) => {
-  const { sort, category, min_price, max_price } = req.query;
+  const { sort, category } = req.query;
   let query = "SELECT * FROM Products WHERE 1=1";
   let values = [];
 
   if (category) {
-    query += " AND category = $" + (values.length + 1);
-    values.push(category);
-  }
-
-  if (min_price) {
-    query += " AND price >= $" + (values.length + 1);
-    values.push(min_price);
-  }
-
-  if (max_price) {
-    query += " AND price <= $" + (values.length + 1);
-    values.push(max_price);
+    query += " AND category = ANY($1)";
+    values.push(category.split(","));
   }
 
   if (sort === "price_asc") {
@@ -56,7 +35,7 @@ app.get("/api/products", async (req, res) => {
   }
 
   try {
-    const { rows } = await pool.query(query, values);
+    const { rows } = await pool.query(query, values.length ? [values] : []);
     res.json(rows);
   } catch (err) {
     console.error(err);
