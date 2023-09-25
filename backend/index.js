@@ -1,7 +1,9 @@
+const cors = require("cors");
 const express = require("express");
 const { Pool } = require("pg");
 
 const app = express();
+app.use(cors());
 const port = 3001; // You can choose any port
 
 // PostgreSQL connection
