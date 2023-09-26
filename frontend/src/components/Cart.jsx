@@ -16,9 +16,14 @@ function Cart({ cartItems, onQuantityChange, onRemoveItem, onCheckout }) {
                 value={item.quantity}
                 min="1"
                 onChange={(e) => onQuantityChange(item.id, e.target.value)}
-                className="appearance-none bg-neutral-700 text-neutral-300 border rounded py-2 px-4 focus:outline-none focus:border-lime-500"
+                className="appearance-none bg-neutral-700 text-neutral-300 border rounded py-2 px-4 focus:outline-none focus:border-lime-500 ml-4"
               />
-              <button onClick={() => onRemoveItem(item.id)}>Remove</button>
+              <button
+                onClick={() => onRemoveItem(item.id)}
+                className="text-amber-300 ml-4"
+              >
+                Remove
+              </button>
             </li>
           ))}
         </ul>

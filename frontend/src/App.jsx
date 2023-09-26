@@ -139,7 +139,7 @@ export default function App() {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }) // Removed the semicolon here
+    })
       .then((response) => response.text())
       .then((message) => {
         console.log(message);
@@ -227,6 +227,13 @@ export default function App() {
             <p className="mt-4">{selectedProduct.description}</p>
             <button
               className="mt-4 bg-lime-500 text-neutral-900 rounded px-4 py-2"
+              onClick={() => addToCart(selectedProduct)}
+            >
+              Add to Cart
+            </button>
+            <br />
+            <button
+              className="mt-4 bg-lime-500 text-neutral-900 rounded px-4 py-2 mb-2"
               onClick={() => setSelectedProduct(null)}
             >
               Back to List
