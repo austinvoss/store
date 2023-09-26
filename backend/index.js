@@ -1,6 +1,8 @@
 const cors = require("cors");
 const express = require("express");
 const { Pool } = require("pg");
+const bcrypt = require("bcrypt"); // Import bcrypt for hashing
+const jwt = require("jsonwebtoken"); // Import jsonwebtoken for generating JWTs
 
 const app = express();
 app.use(cors());
@@ -123,6 +125,72 @@ app.delete("/api/cart/:id", async (req, res) => {
     } else {
       res.status(404).send("Cart item not found");
     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Checkout cart items
+app.post("/api/checkout/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    // Your logic to handle checkout, e.g., creating an order, marking cart items as purchased, etc.
+    res.send("Checkout successful");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Define a sign-up endpoint
+app.post("/api/signup", async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert new user into the database
+    const { rows } = await pool.query(
+      "INSERT INTO Users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING *",
+      [username, email, hashedPassword]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Define a login endpoint
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the user by email
+    const { rows } = await pool.query("SELECT * FROM Users WHERE email = $1", [
+      email,
+    ]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(401).send("Invalid email or password");
+    }
+
+    // Validate the password
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword) {
+      return res.status(401).send("Invalid email or password");
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user.id }, "your_secret_key", {
+      expiresIn: "1h",
+    });
+
+    res.json({ token });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
